@@ -1,0 +1,121 @@
+
+First create a targets file with the design of your certain microarray experiment. For instance, in my experiment I was dealing with a DYE SWAP experiment consisting of two channels labeled cy3 and cy5 on a hybridized glass slide. 
+The reason for conducting a dye swap experiment is to essentially reduce any dye bias that could occur when using pooled tissue samples during hybridization. My experiment GSE number is GSE45596 and it consists of 20 samples on 10 paired arrays. Now I created my targets file as follows in the design below. 
+
+              Sample.Number       FileName      Cy3 Cy5
+GSM1110303             1 	GSM1110303.txt   C   A
+GSM1110304             2 	GSM1110304.txt   A   C
+GSM1110305             3 	GSM1110305.txt   C   A
+GSM1110306             4 	GSM1110306.txt   A   C
+GSM1110307             5 	GSM1110307.txt   C   A
+GSM1110308             6 	GSM1110308.txt   A   C
+GSM1110309             7 	GSM1110309.txt   C   A
+GSM1110310             8 	GSM1110310.txt   A   C
+GSM1110311             9 	GSM1110311.txt   C   A
+GSM1110312            10 	GSM1110312.txt   A   C
+GSM1110313            11 	GSM1110313.txt   C   A
+GSM1110314            12 	GSM1110314.txt   A   C
+GSM1110315            13 	GSM1110315.txt   C   A
+GSM1110316            14 	GSM1110316.txt   A   C
+GSM1110317            15 	GSM1110317.txt   C   A
+GSM1110318            16 	GSM1110318.txt   A   C
+GSM1110319            17 	GSM1110319.txt   C   A
+GSM1110320            18 	GSM1110320.txt   A   C
+GSM1110321            19 	GSM1110321.txt   C   A
+GSM1110322            20 	GSM1110322.txt   A   C
+
+#Set up a directory with all your raw .txt files located within a folder titled with your GSE experiment number. Also, make sure to set your targets file within the directory for the following code inputted into R. 
+
+library(limma)
+targets <- readTargets("targets.txt")
+# Use source as agilent median for background correction of the median value of your cy3 and cy5 signal intensities (RAW)
+RG <- read.maimages(targets,source="agilent.median")
+RG <- backgroundCorrect(RG, method="subtract")
+#This was the output from R that you get following insertion of the code. Note that you should double check with your excel file calculations to confirm your corrected values are similar, in my case they all were. 
+An object of class "RGList"
+$G
+     GSM1110303 GSM1110304 GSM1110305 GSM1110306 GSM1110307 GSM1110308 GSM1110309 GSM1110310
+[1,]    24979.2    10719.0    22990.5    10298.0    28723.6    18155.0    21421.2       6066
+[2,]       79.0       56.0       85.0       60.0       74.5       62.0       77.0         55
+[3,]       79.0       49.5       81.0       58.5       72.0       62.5       74.5         53
+[4,]       82.5       45.0       88.0      211.0       72.5       54.0       67.5         61
+[5,]       87.0       46.5       76.0       53.5       66.5       51.5       70.0         54
+     GSM1110311 GSM1110312 GSM1110313 GSM1110314 GSM1110315 GSM1110316 GSM1110317 GSM1110318
+[1,]    22507.6       8768     3958.0     5828.5    13443.0     6679.5    15172.5    10569.5
+[2,]       87.0         78      109.0       87.0       88.0       93.0       81.0       85.5
+[3,]       84.0         85       93.0       86.5       86.0       80.5       82.0       81.5
+[4,]       84.0         82       99.0       88.0       77.0       81.5       79.0       79.0
+[5,]       93.0         89       96.5       89.0       82.5       86.0       93.0       79.5
+     GSM1110319 GSM1110320 GSM1110321 GSM1110322
+[1,]    18341.0      12383     5609.0     6507.5
+[2,]       78.5         84       70.0       87.0
+[3,]       83.0         76       79.0       80.0
+[4,]       76.0         82       67.0       81.0
+[5,]       80.0         76       68.5       83.0
+45010 more rows ...
+
+$R
+     GSM1110303 GSM1110304 GSM1110305 GSM1110306 GSM1110307 GSM1110308 GSM1110309 GSM1110310
+[1,]    18512.5    24430.6      21500    21263.3    36150.4    29429.6      13440    15879.5
+[2,]       22.0       15.0         21       14.0        8.5       15.0         18       12.0
+[3,]       14.5        8.0         15       17.5       15.0       15.5         13       28.0
+[4,]       16.5       11.5         20      177.0       10.0        9.0         17       15.5
+[5,]       18.5        8.0         22       14.5       15.0       17.0         17        9.0
+     GSM1110311 GSM1110312 GSM1110313 GSM1110314 GSM1110315 GSM1110316 GSM1110317 GSM1110318
+[1,]    16966.0    22431.1     8519.0     9402.5    11298.0    12995.0    12563.5    16536.5
+[2,]       18.0       18.0       27.0       23.0       20.0       21.0       12.0       20.5
+[3,]       15.5       16.0       23.0       19.0       21.0       17.5       19.0       20.5
+[4,]       22.0       21.5       28.0       22.0       17.5       23.0       14.0       20.0
+[5,]       20.0       19.5       27.5       24.0       23.0       24.0       10.0       19.0
+     GSM1110319 GSM1110320 GSM1110321 GSM1110322
+[1,]    28731.1    26710.3     7097.0    11925.0
+[2,]       18.5       16.5       22.0       15.0
+[3,]       17.0       18.5       14.5       14.5
+[4,]       16.0       21.5       15.0       20.0
+[5,]       24.0       15.0       15.5       17.0
+45010 more rows ...
+
+$targets
+           Sample.Number       FileName Cy3 Cy5
+GSM1110303             1 GSM1110303.txt   C   A
+GSM1110304             2 GSM1110304.txt   A   C
+GSM1110305             3 GSM1110305.txt   C   A
+GSM1110306             4 GSM1110306.txt   A   C
+GSM1110307             5 GSM1110307.txt   C   A
+15 more rows ...
+
+$genes
+  Row Col ProbeUID ControlType       ProbeName        GeneName  SystematicName Description
+1   1   1        0           1 GE_BrightCorner GE_BrightCorner GE_BrightCorner            
+2   1   2        1           1      DarkCorner      DarkCorner      DarkCorner            
+3   1   3        1           1      DarkCorner      DarkCorner      DarkCorner            
+4   1   4        1           1      DarkCorner      DarkCorner      DarkCorner            
+5   1   5        1           1      DarkCorner      DarkCorner      DarkCorner            
+45010 more rows ...
+
+$source
+[1] "agilent.median"
+
+#Next step is to normalizewithin arrays if your study first conducted this normalization as did mine. 
+
+MA <- normalizeWithinArrays(RG, method="loess")
+# Now we average our duplicate probe ID's by gene name with the following code:
+MA.avg <- avereps(MA, ID=MA$genes$ProbeName)
+#In this next step we design our experiment by our targets file and ref is where you enter your control label (for me the label was C).
+design <- modelMatrix(targets, ref="C")
+ # Now that our matrix file is averaged across all probes and loess normalized we take the next step by fitting the averaged MA.avg file into a linearfit model. The reason being that LOESS normalization is a linear based method of statistical normalization.            
+fit1 <- lmfit(MA.avg)
+# During this stage we apply an empirical Bayes method that utilizes a bayesian priori approach for your fit1 file. The empirical Bayes moderated t-statistics test each individual contrast equal to zero. For each gene (row), the moderated F-statistic tests whether all the contrasts are zero. The F-statistic is an overall test computed from the set of t-statistics for that probe. This is exactly analogous the relationship between t-tests and F-statistics in conventional anova, except that the residual mean squares have been moderated between genes
+fit2 <- eBayes(fit)
+# Now we use the code topTable to produce a results table file for your genes that produces columns with the avg.expression value for each probeID, p-value, t-statistic, and method which in my case was a Benjaming Hochberg (BH)
+output <- topTable(fit2, adjust="BH", coef="A", number=nrow(fit2), genelist=MA.avg$genes)
+# Finally we produce a table solely devoted to genes that are significant according to our p-value of determinance. Mine was 0.05. 
+genes_diff_expr.005<- subset(output,output$adj.P.Val < 0.05)
+#Finally, in order to extract all your output from your analysis us the following code that produces a text-tab_delimited file that can easily be inputted into excel for interpretation and results.  
+Significant Results <- write.table(genes_diff_expr.005, file = "Significant Results.txt")
+
+Please ask me if you need any help with this workflow and Rscript. 
+
+
+
+
